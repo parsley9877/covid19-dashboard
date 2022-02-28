@@ -138,10 +138,10 @@ def update_select_data(selectedData, date, value):
     df_by_states = pd.DataFrame()
     for state in state_list:
         df_by_state = selected_df[selected_df['state_abbrv'] == state]
-        df_by_state['Incident_Rate_by_day'] = df_by_state[value].diff()
+        df_by_state[value+'_by_day'] = df_by_state[value].diff()
         df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
     print(df_by_states)
-    fig =  px.line(df_by_states, x='date', y='Incident_Rate_by_day', markers=True)
+    fig =  px.line(df_by_states, x='date', y=value+'_by_day', markers=True)
     return fig 
 
 @app.callback(
