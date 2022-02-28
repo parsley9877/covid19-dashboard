@@ -12,6 +12,7 @@ import json
 import os
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 
 import utils
 
@@ -26,6 +27,9 @@ state_map = dcc.Graph(id='state_map', style={'width':'100%'})
 map_div = html.Div(children=[state_map])
 
 
+selected_data = html.Div([
+                    dcc.Graph(id='selected-data'),
+                ], style={'display': 'inline-block', 'width': '100%'})
 #Datepicker
 
 dp = dcc.DatePickerSingle(
@@ -70,11 +74,10 @@ navbar = html.Div(id='navbar', className='top-nav' ,children=[
 ])
 
 first_row_tab_1 = html.Div(children=[dp_div, dd_div], className='first-row-tab1')
-
-tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div])
+    
+tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div, selected_data])
 tab_2 = html.Div(className='tab-2', children=[html.A('DUMMY TAB 2 (TO BE DONE)', id='dummy-id')])
 tab_3 = html.Div(className='tab-3', children=[html.A('DUMMY TAB 3 (TO BE DONE)', id='dummy-id')])
-
 
 current_tab = html.Div(id='current-tab', children=[tab_1])
 
@@ -99,7 +102,47 @@ def display_page(pathname):
         return [tab_3]
     else:
         return [tab_1]
-
+    
+@app.callback(
+    dash.dependencies.Output('selected-data', 'figure'),
+    [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('datepicker', 'date'), dash.dependencies.Input('dropdown', 'value')]
+)
+def update_select_data(selectedData, date, value):
+    if not selectedData:
+        raise dash.exceptions.PreventUpdate
+    #create range of date+-5
+    df_range = pd.DataFrame()
+    datetime_object = datetime.strptime(date, '%Y-%m-%d')
+    start_date = datetime_object + timedelta(days=-7) #extra day for death differences, remove later
+    end_date = datetime_object + timedelta(days=5)
+    date_range = pd.date_range(start=start_date, end=end_date, inclusive='right').strftime('%m-%d-%Y')
+    
+    #Gather csvs with range of date +-5
+    for date_object in date_range:
+        # print(date_object)
+        file_name = date_object
+        file_path = base_data_path + file_name
+        file_path = file_path.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+        df = pd.read_csv(file_path+'.csv')
+        df = utils.filter_unknown_states(df)
+        df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
+        df['date'] = date_object
+        df_range = pd.concat([df_range, df])     
+    # print(df_range)
+    state_list = []
+    for item in selectedData["points"]:
+        state_list.append(item["location"])
+        
+    selected_df = df_range[df_range['state_abbrv'].isin(state_list)]
+    selected_df = selected_df.astype({value: float})
+    df_by_states = pd.DataFrame()
+    for state in state_list:
+        df_by_state = selected_df[selected_df['state_abbrv'] == state]
+        df_by_state['Incident_Rate_by_day'] = df_by_state[value].diff()
+        df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
+    print(df_by_states)
+    fig =  px.line(df_by_states, x='date', y='Incident_Rate_by_day', markers=True)
+    return fig 
 
 @app.callback(
     dash.dependencies.Output('state_map', 'figure'),
