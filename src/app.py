@@ -69,7 +69,7 @@ header = html.Div(id='header', style={'backgroundColor':'#051833'}, children=[
 
 # Buttons
 
-but1 = html.Div(id='but-1', children=html.A('Incidents Map', id='tab-1-nav', className='nav-buttons', href='tab1'))
+but1 = html.Div(id='but-1', children=html.A('Visualization', id='tab-1-nav', className='nav-buttons', href='tab1'))
 but2 = html.Div(id='but-2', children=html.A('Data Analysis', id='tab-2-nav', href='tab2', className='nav-buttons'))
 but3 = html.Div(id='but-3', children=html.A('Prediction', id='tab-3-nav', href='tab3', className='nav-buttons'))
 
