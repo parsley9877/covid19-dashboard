@@ -13,3 +13,27 @@ def filter_unknown_states(df):
     new_df = df[~df['Province_State'].isin(unknown_states)]
     return new_df
 
+empty_bar =  {
+    "layout": {
+        "xaxis": {
+            "visible": False
+        },
+        "yaxis": {
+            "visible": False
+        },
+    "paper_bgcolor": '#a4b6fa',
+        "margin": {'l':20, 'r':20, 't':20, 'b':20},
+        "annotations": [
+            {
+                "text": "Empty Plot: Please Select States on Map",
+                "xref": "paper",
+                "yref": "paper",
+                "showarrow": False,
+                "font": {
+                    "size": 20
+                }
+            }
+        ],
+
+    }
+}

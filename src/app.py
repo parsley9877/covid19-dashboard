@@ -37,11 +37,11 @@ selected_data = html.Div([
 # Date picker
 
 dp = dcc.DatePickerSingle(
-    min_date_allowed=date(2020, 4, 12),
+    min_date_allowed=date(2020, 12, 14),
     max_date_allowed=date(2022, 2, 23),
     month_format='MMM Do, YY',
     placeholder='MMM Do, YY',
-    date=date(2020,12, 4),
+    date=date(2020,12, 14),
     id='datepicker'
 )
 
@@ -141,8 +141,8 @@ def display_page(pathname):
 def update_select_data(selectedData, date, value):
 
 
-    if not selectedData:
-        raise dash.exceptions.PreventUpdate
+    if selectedData == None:
+        return utils.empty_bar
     #create range of date+-5
     df_range = pd.DataFrame()
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
@@ -194,7 +194,7 @@ def update_bar(selectedData, date, value):
         )
         return fig
     else:
-        return {}
+        return utils.empty_bar
 
 @app.callback(
     dash.dependencies.Output('state_map', 'figure'),
@@ -245,7 +245,7 @@ def update_state_map(url, date, value):
 
     fig.update_layout(
         title_text = value,
-        geo_scope='usa', # limite map scope to USA
+        geo_scope='usa', # limite map scope to USA,
     )
 
     fig.update_layout(margin={"r":0,"t":30,"l":0,"b":0})
