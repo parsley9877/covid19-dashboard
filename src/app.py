@@ -1,3 +1,5 @@
+import copy
+
 from dash import dcc
 from dash import html
 import dash
@@ -18,9 +20,11 @@ import utils
 
 base_data_path = 'https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_daily_reports_us/'
 data_path = 'https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_daily_reports_us/01-01-2021.csv'
+vac_data_path_base = './data/COVID-19_Vaccinations_in_the_United_States_Jurisdiction.csv'
 raw_link = data_path.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
 df = pd.read_csv(raw_link)
 df = utils.filter_unknown_states(df)
+vac_df = pd.read_csv(vac_data_path_base)
 
 
 state_map = dcc.Graph(id='state_map', style={'width':'100%'})
@@ -45,10 +49,14 @@ dp_div = html.Div(children=[html.A('Please pick a date  '), dp], className='dp-d
 
 # Dropdown
 
-services = ['Confirmed', 'Deaths', 'Incident_Rate', 'Total_Test_Results', 'Case_Fatality_Ratio', 'Testing_Rate', 'Hospitalization_Rate']
+services = ['Confirmed', 'Deaths', 'Incident_Rate', 'Total_Test_Results', 'Case_Fatality_Ratio',
+            'Testing_Rate', 'Hospitalization_Rate']
+vac_services = ['Administered', 'Admin_Per_100K',
+            'Distributed', 'Distributed_Janssen', 'Distributed_Pfizer', 'Dist_Per_100K', 'Administered_Janssen',
+            'Administered_Moderna', 'Administered_Pfizer']
 red_scheme = ['Confirmed', 'Deaths', 'Incident_Rate', 'Case_Fatality_Ratio', 'Hospitalization_Rate']
 blue_schemes = ['Testing_Rate', 'Total_Test_Results']
-drop_down = dcc.Dropdown(services, 'Incident_Rate', id='dropdown')
+drop_down = dcc.Dropdown(services+vac_services, 'Incident_Rate', id='dropdown')
 dd_div = html.Div(children=[html.A('What to Visualize:  '), drop_down], className='dd-div')
 
 
@@ -148,13 +156,23 @@ def update_select_data(selectedData, date, value):
     dash.dependencies.Output('state_map', 'figure'),
     [dash.dependencies.Input('url', 'pathname'), dash.dependencies.Input('datepicker', 'date'), dash.dependencies.Input('dropdown', 'value')])
 def update_state_map(url, date, value):
-    datetime_object = datetime.strptime(date, '%Y-%m-%d')
-    file_name = '{:02d}-{:02d}-{:04d}'.format(datetime_object.month, datetime_object.day, datetime_object.year)
-    file_path = base_data_path + file_name
-    file_path = file_path.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
-    df = pd.read_csv(file_path+'.csv')
-    df = utils.filter_unknown_states(df)
-    df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
+
+    if value in vac_services:
+        global vac_df
+        datetime_object = datetime.strptime(date, '%Y-%m-%d')
+        file_name = '{:02d}/{:02d}/{:04d}'.format(datetime_object.month, datetime_object.day, datetime_object.year)
+        print(file_name)
+        vac_df_new = vac_df[vac_df['Date'] == file_name]
+
+
+    else:
+        datetime_object = datetime.strptime(date, '%Y-%m-%d')
+        file_name = '{:02d}-{:02d}-{:04d}'.format(datetime_object.month, datetime_object.day, datetime_object.year)
+        file_path = base_data_path + file_name
+        file_path = file_path.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+        df = pd.read_csv(file_path+'.csv')
+        df = utils.filter_unknown_states(df)
+        df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
     print(value)
     print(date)
     if value in red_scheme:
@@ -164,12 +182,20 @@ def update_state_map(url, date, value):
             locationmode = 'USA-states', # set of locations match entries in `locations`
             colorscale = 'Reds',
         ))
-    else:
+    elif value in blue_schemes:
         fig = go.Figure(data=go.Choropleth(
             locations=df['state_abbrv'],  # Spatial coordinates
             z=df[value].astype(float),  # Data to be color-coded
             locationmode='USA-states',  # set of locations match entries in `locations`
             colorscale='Blues',
+        ))
+
+    else:
+        fig = go.Figure(data=go.Choropleth(
+            locations=vac_df_new['Location'],  # Spatial coordinates
+            z=vac_df_new[value].astype(float),  # Data to be color-coded
+            locationmode='USA-states',  # set of locations match entries in `locations`
+            colorscale='mint',
         ))
 
 
