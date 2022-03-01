@@ -33,8 +33,8 @@ map_div = html.Div(children=[state_map])
 
 selected_data = html.Div([
                     dcc.Graph(id='selected-data'),
-                ], style={'display': 'inline-block', 'width': '100%'})
-#Datepicker
+                ], style={'display': 'inline-block', 'width': '100%'}, className='loading_wrapper')
+# Date picker
 
 dp = dcc.DatePickerSingle(
     min_date_allowed=date(2020, 4, 12),
@@ -81,9 +81,21 @@ navbar = html.Div(id='navbar', className='top-nav' ,children=[
         but3,
 ])
 
+# Loader
+dcc.Loading(
+    parent_className='loading_wrapper',
+    children=[selected_data]
+)
+
+# Bar chart
+barchart = dcc.Graph(id='bar-chart', style={'width':'100%'})
+bar_div = html.Div(children=[barchart])
+
+
+
 first_row_tab_1 = html.Div(children=[dp_div, dd_div], className='first-row-tab1')
     
-tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div, selected_data])
+tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div, selected_data, bar_div])
 tab_2 = html.Div(className='tab-2', children=[html.A('DUMMY TAB 2 (TO BE DONE)', id='dummy-id')])
 tab_3 = html.Div(className='tab-3', children=[html.A('DUMMY TAB 3 (TO BE DONE)', id='dummy-id')])
 
@@ -116,13 +128,15 @@ def display_page(pathname):
     [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('datepicker', 'date'), dash.dependencies.Input('dropdown', 'value')]
 )
 def update_select_data(selectedData, date, value):
+
+
     if not selectedData:
         raise dash.exceptions.PreventUpdate
     #create range of date+-5
     df_range = pd.DataFrame()
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
-    start_date = datetime_object + timedelta(days=-7) #extra day for death differences, remove later
-    end_date = datetime_object + timedelta(days=5)
+    start_date = datetime_object + timedelta(days=-20) #extra day for death differences, remove later
+    end_date = datetime_object + timedelta(days=20)
     date_range = pd.date_range(start=start_date, end=end_date, inclusive='right').strftime('%m-%d-%Y')
     
     #Gather csvs with range of date +-5
@@ -150,7 +164,26 @@ def update_select_data(selectedData, date, value):
         df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
     # print(df_by_states)
     fig =  px.line(df_by_states, x='date', y=value+'_by_day', color='Province_State', markers=True)
-    return fig 
+    return fig
+
+
+@app.callback(
+    dash.dependencies.Output('bar-chart', 'figure'),
+    [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('datepicker', 'date'), dash.dependencies.Input('dropdown', 'value')]
+)
+def update_bar(selectedData, date, value):
+    if selectedData != None:
+        fig = px.bar(selectedData['points'], x="location", y="z", title= value)
+        fig.update_traces(marker_color='#04AA6D')
+        fig.update_layout(margin={"r": 0, "t": 70, "l": 0, "b": 0})
+        fig.update_layout(
+            xaxis=go.layout.XAxis(
+                tickangle=-45
+            )
+        )
+        return fig
+    else:
+        return {}
 
 @app.callback(
     dash.dependencies.Output('state_map', 'figure'),

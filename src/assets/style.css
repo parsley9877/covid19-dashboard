@@ -102,5 +102,9 @@
   }
 
 
+  .loading_wrapper > div {
+    visibility: visible !important;
+}
+
 
 
