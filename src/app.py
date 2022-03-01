@@ -89,6 +89,17 @@ dcc.Loading(
 
 # Bar chart
 barchart = dcc.Graph(id='bar-chart', style={'width':'100%'})
+barchart.__annotations__ =[
+            {
+                "text": "No matching data found",
+                "xref": "paper",
+                "yref": "paper",
+                "showarrow": False,
+                "font": {
+                    "size": 28
+                }
+            }
+        ]
 bar_div = html.Div(children=[barchart])
 
 
@@ -194,7 +205,6 @@ def update_state_map(url, date, value):
         global vac_df
         datetime_object = datetime.strptime(date, '%Y-%m-%d')
         file_name = '{:02d}/{:02d}/{:04d}'.format(datetime_object.month, datetime_object.day, datetime_object.year)
-        print(file_name)
         vac_df_new = vac_df[vac_df['Date'] == file_name]
 
 

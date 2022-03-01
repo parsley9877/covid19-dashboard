@@ -50,7 +50,7 @@
   #navbar {
     float: left;
     width: 10%;
-    padding-bottom: 700px;
+    padding-bottom: 1500px;
   }
 
   
@@ -68,7 +68,7 @@
   #current-tab{
     background-color: #ffffff;
     float: left;
-    width: 80%;
+    width: 90%;
     margin: 0;
     height: inherit;
   }
@@ -92,7 +92,7 @@
   }
 
   .first-row-tab1{
-    margin: 10px;
+    margin-bottom: 10px;
     padding: 10px;
   }
 
