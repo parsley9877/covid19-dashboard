@@ -140,8 +140,8 @@ def update_select_data(selectedData, date, value):
         df_by_state = selected_df[selected_df['state_abbrv'] == state]
         df_by_state[value+'_by_day'] = df_by_state[value].diff()
         df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
-    print(df_by_states)
-    fig =  px.line(df_by_states, x='date', y=value+'_by_day', markers=True)
+    # print(df_by_states)
+    fig =  px.line(df_by_states, x='date', y=value+'_by_day', color='Province_State', markers=True)
     return fig 
 
 @app.callback(
@@ -155,8 +155,8 @@ def update_state_map(url, date, value):
     df = pd.read_csv(file_path+'.csv')
     df = utils.filter_unknown_states(df)
     df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
-    print(value)
-    print(date)
+    # print(value)
+    # print(date)
     if value in red_scheme:
         fig = go.Figure(data=go.Choropleth(
             locations=df['state_abbrv'], # Spatial coordinates
