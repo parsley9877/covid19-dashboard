@@ -1,0 +1,9 @@
+pandas
+numpy
+dash
+plotly
+selenium
+sklearn
+dash-leaflet
+dash_daq
+geopy
