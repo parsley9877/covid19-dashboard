@@ -29,11 +29,11 @@ def read_file(filepath):
     return df
 
 
-def get_data_by_location(locations, date, value, past_days=30):
+def get_data_by_location(locations, date, value, past_days=30, next_days=0):
     df_range = pd.DataFrame()
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
     start_date = datetime_object + timedelta(days=-past_days)
-    end_date = datetime_object
+    end_date = datetime_object + timedelta(days=next_days)
     date_range = pd.date_range(start=start_date, end=end_date, closed='right').strftime('%m-%d-%Y')
     
     #Gather csvs with range of date +-5
