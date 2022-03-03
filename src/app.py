@@ -2,12 +2,14 @@ import copy
 
 from dash import dcc
 from dash import html
+from dash.dependencies import Output, Input, State
 import dash
 from urllib.request import urlopen
 import json
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import dash_daq as daq
 import io
 import requests
 import json
@@ -103,7 +105,69 @@ barchart.__annotations__ =[
 bar_div = html.Div(children=[barchart])
 
 
-# Dat
+# Pred tab first sec
+combo_box_pred_tab = dcc.Dropdown(list(utils.us_states.keys()), 'California', id='dropdown-2', multi=True)
+cmpt_div = html.Div(children=[html.A('Please select a US state:  '), combo_box_pred_tab], className='dd-div-2')
+day_input_tab2 = daq.NumericInput( label='Time span (Days)',labelPosition='top', value=30,
+                                   size=120, min=1, max=100, id='day-picker')
+dit_div = html.Div(children=[day_input_tab2],  className='di-div-2')
+
+dp2 = dcc.DatePickerSingle(
+    min_date_allowed=date(2020, 12, 14),
+    max_date_allowed=date(2022, 2, 23),
+    month_format='MMM Do, YY',
+    placeholder='MMM Do, YY',
+    date=date(2020,12, 14),
+    id='datepicker-2'
+)
+
+dp2_div = html.Div(children=[html.A('Please pick a date  ', className='label-dp-2'), dp2], className='dp-div-2')
+dd3 = dcc.Dropdown(services+vac_services + ['Select Features ...'], id='dropdown-3', multi=True)
+dd3_div = html.Div(children=[dd3], className='dd3-div')
+but4 = html.Button('Get Pearson Correlation', id='submit-val', n_clicks=0)
+but4_div=  html.Div(children=[but4], className='but4-div')
+
+second_row_tab_pred = html.Div(children=[cmpt_div, dit_div, dp2_div, dd3_div, but4_div], className='second-row-tab2')
+
+cor_heatmap = dcc.Graph(id='cor-hm')
+cor_heatmap_div = html.Div(children=[cor_heatmap], className = 'cor-hm-div')
+pval_heatmap = dcc.Graph(id='pval-hm')
+pval_heatmap_div = html.Div(children=[pval_heatmap], className = 'pvals-hm-div')
+hp_div = html.Div(children=[cor_heatmap_div, pval_heatmap_div])
+
+
+# Pred tab second section
+combo_box_pred_tab_v_2 = dcc.Dropdown(list(utils.us_states.keys()), 'California', id='dropdown-v-2', multi=True)
+cmpt_div_v2 = html.Div(children=[html.A('Please select a US state:  '), combo_box_pred_tab_v_2], className='dd-div-v-2')
+day_input_tab_v_2 = daq.NumericInput( label='Days Before',labelPosition='top', value=10,
+                                   size=120, min=1, max=100, id='day-picker-v-2')
+dit_div_v_2 = html.Div(children=[day_input_tab_v_2],  className='di-div-v-2')
+
+day_input_tab_v_2_e = daq.NumericInput( label='Days After',labelPosition='top', value=10,
+                                   size=120, min=1, max=100, id='day-picker-v-2-e')
+dit_div_v_2_e = html.Div(children=[day_input_tab_v_2_e],  className='di-div-v-2-e')
+
+dp2_v2 = dcc.DatePickerSingle(
+    min_date_allowed=date(2020, 12, 14),
+    max_date_allowed=date(2022, 2, 23),
+    month_format='MMM Do, YY',
+    placeholder='MMM Do, YY',
+    date=date(2020,12, 14),
+    id='datepicker-2'
+)
+
+dp2_div_v2 = html.Div(children=[html.A('Please pick a date  ', className='label-dp-v-2'), dp2], className='dp-div-v-2')
+dd3_v2 = dcc.Dropdown(services+vac_services + ['Select Features ...'], id='dropdown-v-2', multi=True)
+dd3_div_v2 = html.Div(children=[dd3_v2], className='dd3-div-v-2')
+but4_v2 = html.Button('Get Prediction', id='submit-val-v-2', n_clicks=0)
+but4_div_v2= html.Div(children=[but4_v2], className='but4-div-v-2')
+third_row_tab_pred = html.Div(children=[cmpt_div_v2, dit_div_v_2, dit_div_v_2_e, dp2_div_v2, dd3_div_v2, but4_div_v2], className='third-row-tab2')
+#
+# cor_heatmap = dcc.Graph(id='cor-hm')
+# cor_heatmap_div = html.Div(children=[cor_heatmap], className = 'cor-hm-div')
+# pval_heatmap = dcc.Graph(id='pval-hm')
+# pval_heatmap_div = html.Div(children=[pval_heatmap], className = 'pvals-hm-div')
+# hp_div = html.Div(children=[cor_heatmap_div, pval_heatmap_div])
 
 
 
@@ -111,17 +175,39 @@ bar_div = html.Div(children=[barchart])
 first_row_tab_1 = html.Div(children=[dp_div, dd_div], className='first-row-tab1')
 tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div, selected_data, bar_div])
 tab_2 = html.Div(className='tab-2', children=[])
-tab_3 = html.Div(className='tab-3', children=[html.A('DUMMY TAB 3 (TO BE DONE)', id='dummy-id')])
+tab_3 = html.Div(className='tab-3', children=[second_row_tab_pred, hp_div,  third_row_tab_pred])
 
 current_tab = html.Div(id='current-tab', children=[tab_1])
 
 
-app = dash.Dash(__name__, suppress_callback_exceptions=False)
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = 'COVID-19 Dashboard'
-app.layout = html.Div(id='layout', children=[dcc.Location(id='url', refresh=False), header, html.Div(children=[navbar, current_tab])])
+app.layout = html.Div(id='layout', children=[dcc.Location(id='url', refresh=False), html.Div(children=[header, navbar, html.Div(children=[current_tab])])])
 
 
 # Callbacks
+
+# but callback
+@app.callback(
+    [Output('cor-hm', 'figure'), Output('pval-hm', 'figure')],
+    Input('submit-val', 'n_clicks'),
+    [State('dropdown-2', 'value'), State('dropdown-3', 'value'), State('datepicker-2', 'date'), State('day-picker', 'value')]
+)
+def update_output(n_clicks, us_state, value, date, days):
+    if n_clicks == 0:
+        return [utils.empty_heatmap, utils.empty_heatmap]
+    output_dict = utils.NIKHIL_CORRELATION_FUNC(us_state, value, date, days)
+    correlation_matrix = output_dict['correlation_matrix']
+    pvals_matrix = output_dict['pvals_matrix']
+    cor_fig = px.imshow(correlation_matrix, text_auto=True, x=value, y=value)
+    pval_fig = px.imshow(pvals_matrix, text_auto=True, x=value, y = value)
+    cor_fig.update_layout(
+        title_text='Correlation Matrix',
+    )
+    pval_fig.update_layout(
+        title_text='P-Value Matrix',
+    )
+    return [cor_fig, pval_fig]
 
 # Navbar callbacks
 

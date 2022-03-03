@@ -84,12 +84,85 @@
     /*width: 50%;*/
   }
 
+    .dp-div-2{
+    margin: 10px;
+    padding: 10px;
+      float: initial;
+      /*width: 35%;*/
+  }
+
+    .dd3-div{
+      margin: 10px;
+    padding: 10px;
+      /*float: left;*/
+    }
+
+    .dp-div-v-2{
+    margin: 10px;
+    padding: 10px;
+      float: initial;
+      /*width: 35%;*/
+  }
+
+    .dd3-div-v-2{
+      margin: 10px;
+    padding: 10px;
+      /*float: left;*/
+    }
+
   .dd-div{
     margin: 10px;
     padding: 10px;
     /*float: left;*/
     /*width: 50%;*/
   }
+
+  .dd-div-2{
+    margin: 10px;
+    padding: 10px;
+    float: left;
+    width: 30%;
+  }
+
+    .di-div-2{
+    margin: 10px;
+    padding: 10px;
+    float: left;
+    width: 10%;
+  }
+
+    .but4-div{
+      margin: 10px;
+    padding: 10px;
+      /*float: left;*/
+    }
+
+    .dd-div-v-2{
+    margin: 10px;
+    padding: 10px;
+    float: left;
+    width: 30%;
+  }
+
+    .di-div-v-2{
+    margin: 10px;
+    padding: 10px;
+    float: left;
+    width: 10%;
+  }
+
+    .di-div-v-2-e{
+    margin: 10px;
+    padding: 10px;
+    float: left;
+    width: 10%;
+  }
+
+    .but4-div-v-2{
+      margin: 10px;
+    padding: 10px;
+      /*float: left;*/
+    }
 
   .first-row-tab1{
     margin-bottom: 10px;
@@ -103,9 +176,45 @@
   }
 
 
+   .second-row-tab2{
+    margin-bottom: 10px;
+    padding: 10px;
+     margin-left: 10px;
+     margin-top: 10px;
+  }
+
+   .third-row-tab2{
+    margin-bottom: 10px;
+    padding: 10px;
+     margin-left: 10px;
+     margin-top: 470px;
+  }
+
+
+  .second-row-tab2{
+    background-color: #a4b6fa;
+      border-radius:50px;
+  }
+
+
+  .third-row-tab2{
+    background-color: #a4b6fa;
+      border-radius:50px;
+  }
+
+
   .loading_wrapper > div {
     visibility: visible !important;
 }
+
+  .cor-hm-div{
+    float: left;
+    width: 50%;
+  }
+  .pvals-hm-div{
+    float: left;
+    width: 50%;
+  }
 
 
 
