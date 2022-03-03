@@ -1,5 +1,3 @@
-import copy
-
 from dash import dcc
 from dash import html
 from dash.dependencies import Output, Input, State
@@ -35,7 +33,9 @@ map_div = html.Div(children=[state_map])
 
 selected_data = html.Div([
                     dcc.Graph(id='selected-data'),
+                    dcc.Store(id='intermediate-value')
                 ], style={'display': 'inline-block', 'width': '100%'}, className='loading_wrapper')
+
 # Date picker
 
 dp = dcc.DatePickerSingle(
@@ -224,15 +224,11 @@ def display_page(pathname):
         return [tab_1]
     
 @app.callback(
-    dash.dependencies.Output('selected-data', 'figure'),
-    [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('datepicker', 'date'), dash.dependencies.Input('dropdown', 'value')]
-)
-def update_select_data(selectedData, date, value):
-
-
-    if selectedData == None:
-        return utils.empty_bar
-    #create range of date+-5
+    dash.dependencies.Output('intermediate-value', 'data'),
+    [dash.dependencies.Input('datepicker', 'date')]
+)    
+def update_select_date(date):
+        #create range of date+-5
     df_range = pd.DataFrame()
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
     start_date = datetime_object + timedelta(days=-20) #extra day for death differences, remove later
@@ -249,12 +245,27 @@ def update_select_data(selectedData, date, value):
         df = utils.filter_unknown_states(df)
         df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
         df['date'] = date_object
-        df_range = pd.concat([df_range, df])     
+        # print(df)
+        df_range = pd.concat([df_range, df])
+    return(df_range.reset_index().to_dict())
+      
+@app.callback(
+    dash.dependencies.Output('selected-data', 'figure'),
+    [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('dropdown', 'value'), dash.dependencies.Input('intermediate-value', 'data')]
+)
+def update_select_data(selectedData, value, df_range):
     # print(df_range)
+    df_range = pd.DataFrame.from_dict(df_range)
+    # print(selected_data)
+    # print(selected_data)
+    if selectedData == None:
+        print("true")
+        return utils.empty_bar
+
     state_list = []
     for item in selectedData["points"]:
         state_list.append(item["location"])
-        
+
     selected_df = df_range[df_range['state_abbrv'].isin(state_list)]
     selected_df = selected_df.astype({value: float})
     df_by_states = pd.DataFrame()
@@ -262,7 +273,11 @@ def update_select_data(selectedData, date, value):
         df_by_state = selected_df[selected_df['state_abbrv'] == state]
         df_by_state[value+'_by_day'] = df_by_state[value].diff()
         df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
+    # print(df_range)
+    # print(state_list)
+    # print(selected_df)
     # print(df_by_states)
+    
     fig =  px.line(df_by_states, x='date', y=value+'_by_day', color='Province_State', markers=True)
     return fig
 
