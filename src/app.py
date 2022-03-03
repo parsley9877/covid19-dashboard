@@ -103,11 +103,14 @@ barchart.__annotations__ =[
 bar_div = html.Div(children=[barchart])
 
 
+# Dat
+
+
+
 
 first_row_tab_1 = html.Div(children=[dp_div, dd_div], className='first-row-tab1')
-    
 tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div, selected_data, bar_div])
-tab_2 = html.Div(className='tab-2', children=[html.A('DUMMY TAB 2 (TO BE DONE)', id='dummy-id')])
+tab_2 = html.Div(className='tab-2', children=[])
 tab_3 = html.Div(className='tab-3', children=[html.A('DUMMY TAB 3 (TO BE DONE)', id='dummy-id')])
 
 current_tab = html.Div(id='current-tab', children=[tab_1])
@@ -256,10 +259,6 @@ def update_state_map(url, date, value):
     )
 
     return fig
-
-
-
-
 
 
 if __name__ == '__main__':
