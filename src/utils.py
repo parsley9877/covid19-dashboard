@@ -1,6 +1,7 @@
 import json
 
 import numpy as np
+import pandas
 
 us_states_json_path = './src/assets/us_states.json'
 with open(us_states_json_path, 'r') as obj:
@@ -19,7 +20,12 @@ def NIKHIL_CORRELATION_FUNC(us_state, value, date, days):
     return {'correlation_matrix': np.eye(len(value)), 'pvals_matrix': np.eye(len(value))}
 
 def NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after):
-    return
+    dummy_dates = [str(i) for i in range(50)]
+    dummy_pred_data = [float(i) for i in range(50)]
+    dummy_actual_data = [float(i**2) for i in range(50)]
+    dummy_df = pandas.DataFrame(data= {'date': dummy_dates, 'preds': dummy_pred_data, 'actual': dummy_actual_data})
+
+    return dummy_df
 
 empty_bar =  {
     "layout": {
@@ -59,6 +65,31 @@ empty_heatmap =  {
         "annotations": [
             {
                 "text": "Empty Heatmap: Please set params and hit the button!",
+                "xref": "paper",
+                "yref": "paper",
+                "showarrow": False,
+                "font": {
+                    "size": 20
+                }
+            }
+        ],
+
+    }
+}
+
+empty_pred_line =  {
+    "layout": {
+        "xaxis": {
+            "visible": False
+        },
+        "yaxis": {
+            "visible": False
+        },
+    "paper_bgcolor": '#a4b6fa',
+        "margin": {'l':20, 'r':20, 't':20, 'b':20},
+        "annotations": [
+            {
+                "text": "Empty Prediction: Please set params and hit the button!",
                 "xref": "paper",
                 "yref": "paper",
                 "showarrow": False,

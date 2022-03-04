@@ -127,6 +127,7 @@ dd3_div = html.Div(children=[dd3], className='dd3-div')
 but4 = html.Button('Get Pearson Correlation', id='submit-val', n_clicks=0)
 but4_div=  html.Div(children=[but4], className='but4-div')
 
+
 second_row_tab_pred = html.Div(children=[cmpt_div, dit_div, dp2_div, dd3_div, but4_div], className='second-row-tab2')
 
 cor_heatmap = dcc.Graph(id='cor-hm')
@@ -137,7 +138,7 @@ hp_div = html.Div(children=[cor_heatmap_div, pval_heatmap_div])
 
 
 # Pred tab second section
-combo_box_pred_tab_v_2 = dcc.Dropdown(list(utils.us_states.keys()), 'California', id='dropdown-v-2', multi=True)
+combo_box_pred_tab_v_2 = dcc.Dropdown(list(utils.us_states.keys()), 'California', id='dropdown-v-2', multi=False)
 cmpt_div_v2 = html.Div(children=[html.A('Please select a US state:  '), combo_box_pred_tab_v_2], className='dd-div-v-2')
 day_input_tab_v_2 = daq.NumericInput( label='Days Before',labelPosition='top', value=10,
                                    size=120, min=1, max=100, id='day-picker-v-2')
@@ -153,15 +154,16 @@ dp2_v2 = dcc.DatePickerSingle(
     month_format='MMM Do, YY',
     placeholder='MMM Do, YY',
     date=date(2020,12, 14),
-    id='datepicker-2'
+    id='datepicker-v-2'
 )
-
-dp2_div_v2 = html.Div(children=[html.A('Please pick a date  ', className='label-dp-v-2'), dp2], className='dp-div-v-2')
-dd3_v2 = dcc.Dropdown(services+vac_services + ['Select Features ...'], id='dropdown-v-2', multi=True)
+pred_line = dcc.Graph(id='pred-line')
+pred_line_div = html.Div(children=[pred_line], className='pred-line-div')
+dp2_div_v2 = html.Div(children=[html.A('Please pick a date  ', className='label-dp-v-2'), dp2_v2], className='dp-div-v-2')
+dd3_v2 = dcc.Dropdown(services+vac_services + ['Select Features ...'], id='dropdown-v-3')
 dd3_div_v2 = html.Div(children=[dd3_v2], className='dd3-div-v-2')
 but4_v2 = html.Button('Get Prediction', id='submit-val-v-2', n_clicks=0)
 but4_div_v2= html.Div(children=[but4_v2], className='but4-div-v-2')
-third_row_tab_pred = html.Div(children=[cmpt_div_v2, dit_div_v_2, dit_div_v_2_e, dp2_div_v2, dd3_div_v2, but4_div_v2], className='third-row-tab2')
+third_row_tab_pred = html.Div(children=[cmpt_div_v2, dit_div_v_2, dit_div_v_2_e, dp2_div_v2, dd3_div_v2, but4_div_v2, pred_line_div], className='third-row-tab2')
 #
 # cor_heatmap = dcc.Graph(id='cor-hm')
 # cor_heatmap_div = html.Div(children=[cor_heatmap], className = 'cor-hm-div')
@@ -195,7 +197,9 @@ app.layout = html.Div(id='layout', children=[dcc.Location(id='url', refresh=Fals
 )
 def update_output(n_clicks, us_state, value, date, days):
     if n_clicks == 0:
+        print(n_clicks, us_state, value, date, days)
         return [utils.empty_heatmap, utils.empty_heatmap]
+    print(n_clicks, us_state, value, date, days)
     output_dict = utils.NIKHIL_CORRELATION_FUNC(us_state, value, date, days)
     correlation_matrix = output_dict['correlation_matrix']
     pvals_matrix = output_dict['pvals_matrix']
@@ -210,26 +214,19 @@ def update_output(n_clicks, us_state, value, date, days):
     return [cor_fig, pval_fig]
 
 
-# @app.callback(
-#     [Output('cor-hm', 'figure'), Output('pval-hm', 'figure')],
-#     Input('submit-val', 'n_clicks'),
-#     [State('dropdown-2', 'value'), State('dropdown-3', 'value'), State('datepicker-2', 'date'), State('day-picker', 'value')]
-# )
-# def update_preds(n_clicks, us_state, value, date, days_before, days_after):
-#     if n_clicks == 0:
-#         return [utils.empty_heatmap, utils.empty_heatmap]
-#     output_dict = utils.NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after)
-#     correlation_matrix = output_dict['correlation_matrix']
-#     pvals_matrix = output_dict['pvals_matrix']
-#     cor_fig = px.imshow(correlation_matrix, text_auto=True, x=value, y=value)
-#     pval_fig = px.imshow(pvals_matrix, text_auto=True, x=value, y = value)
-#     cor_fig.update_layout(
-#         title_text='Correlation Matrix',
-#     )
-#     pval_fig.update_layout(
-#         title_text='P-Value Matrix',
-#     )
-#     return [cor_fig, pval_fig]
+@app.callback(
+    Output('pred-line', 'figure'),
+    Input('submit-val-v-2', 'n_clicks'),
+    [State('dropdown-v-2', 'value'), State('dropdown-v-3', 'value'), State('datepicker-v-2', 'date'), State('day-picker-v-2', 'value'), State('day-picker-v-2-e', 'value')]
+)
+def update_preds(n_clicks, us_state, value, date, days_before, days_after):
+    if n_clicks == 0 or value == None:
+        print(n_clicks, us_state, value, date, days_before, days_after)
+        return utils.empty_pred_line
+    print(n_clicks, us_state, value, date, days_before, days_after)
+    output_df = utils.NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after)
+    fig = px.line(output_df, x='date', y=['preds', 'actual'], markers=True,  title='Prediction for ' + value)
+    return fig
 
 # Navbar callbacks
 
