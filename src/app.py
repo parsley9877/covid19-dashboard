@@ -249,8 +249,8 @@ def display_page(pathname):
     dash.dependencies.Output('intermediate-value', 'data'),
     [dash.dependencies.Input('datepicker', 'date')]
 )    
-def update_select_date(date):
-        #create range of date+-5
+def update_date_df(date):
+    #create range of date+-5
     df_range = pd.DataFrame()
     datetime_object = datetime.strptime(date, '%Y-%m-%d')
     start_date = datetime_object + timedelta(days=-20) #extra day for death differences, remove later
@@ -259,7 +259,6 @@ def update_select_date(date):
     
     #Gather csvs with range of date +-5
     for date_object in date_range:
-        # print(date_object)
         file_name = date_object
         file_path = base_data_path + file_name
         file_path = file_path.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
@@ -267,40 +266,50 @@ def update_select_date(date):
         df = utils.filter_unknown_states(df)
         df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
         df['date'] = date_object
-        # print(df)
         df_range = pd.concat([df_range, df])
+
     return(df_range.reset_index().to_dict())
       
 @app.callback(
     dash.dependencies.Output('selected-data', 'figure'),
-    [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('dropdown', 'value'), dash.dependencies.Input('intermediate-value', 'data')]
+    [dash.dependencies.Input('state_map', 'selectedData'), dash.dependencies.Input('dropdown', 'value'), dash.dependencies.Input('intermediate-value', 'data'), dash.dependencies.Input('datepicker', 'date')]
 )
-def update_select_data(selectedData, value, df_range):
-    # print(df_range)
+def update_select_data(selectedData, value, df_range,date):
     df_range = pd.DataFrame.from_dict(df_range)
-    # print(selected_data)
-    # print(selected_data)
     if selectedData == None:
-        print("true")
+        # print("true")
         return utils.empty_bar
+    if value in vac_services:
+        global vac_df
+        datetime_object = datetime.strptime(date, '%Y-%m-%d')
+        start_date = datetime_object + timedelta(days=-20) #extra day for death differences, remove later
+        end_date = datetime_object + timedelta(days=20)
+        date_range = pd.date_range(start=start_date, end=end_date, inclusive='right').strftime('%m/%d/%Y')
+        vac_df_new = vac_df.loc[vac_df['Date'].isin(date_range)]    
+        state_list = []
+        for item in selectedData["points"]:
+            state_list.append(item["location"])
+        vac_df_new = vac_df_new.iloc[::-1]
+        vac_df_new[value+'_by_day'] = vac_df_new.loc[vac_df_new['Location'].isin(state_list)].groupby('Location')[value].diff()
+        df_by_states = vac_df_new[vac_df_new[value+'_by_day'].notna()]
 
-    state_list = []
-    for item in selectedData["points"]:
-        state_list.append(item["location"])
+        fig =  px.line(df_by_states, x='Date', y=value+'_by_day', color='Location',title=value+'_by_day', markers=True)
+        return fig
+    else:        
+        state_list = []
+        for item in selectedData["points"]:
+            state_list.append(item["location"])
 
-    selected_df = df_range[df_range['state_abbrv'].isin(state_list)]
-    selected_df = selected_df.astype({value: float})
-    df_by_states = pd.DataFrame()
-    for state in state_list:
-        df_by_state = selected_df[selected_df['state_abbrv'] == state]
-        df_by_state[value+'_by_day'] = df_by_state[value].diff()
-        df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
-    # print(df_range)
-    # print(state_list)
-    # print(selected_df)
-    # print(df_by_states)
-    
-    fig =  px.line(df_by_states, x='date', y=value+'_by_day', color='Province_State', markers=True)
+        selected_df = df_range[df_range['state_abbrv'].isin(state_list)]
+        selected_df = selected_df.astype({value: float})
+        df_by_states = pd.DataFrame()
+        for state in state_list:
+            df_by_state = selected_df[selected_df['state_abbrv'] == state]
+            df_by_state[value+'_by_day'] = df_by_state[value].diff()
+            df_by_states = pd.concat([df_by_states, df_by_state[1:]]) 
+
+        
+        fig =  px.line(df_by_states, x='date', y=value+'_by_day', color='Province_State', title=value+'_by_day', markers=True)
     return fig
 
 
@@ -342,8 +351,8 @@ def update_state_map(url, date, value):
         df = pd.read_csv(file_path+'.csv')
         df = utils.filter_unknown_states(df)
         df['state_abbrv'] = df['Province_State'].apply(utils.state_name_to_abbrv)
-    print(value)
-    print(date)
+    # print(value)
+    # print(date)
 
     if value in red_scheme:
         fig = go.Figure(data=go.Choropleth(
