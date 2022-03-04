@@ -15,8 +15,11 @@ def filter_unknown_states(df):
     new_df = df[~df['Province_State'].isin(unknown_states)]
     return new_df
 
-def NIKHIL_CORRELATION_FUNC(a, b, c, d):
-    return {'correlation_matrix': np.eye(len(b)), 'pvals_matrix': np.eye(len(b))}
+def NIKHIL_CORRELATION_FUNC(us_state, value, date, days):
+    return {'correlation_matrix': np.eye(len(value)), 'pvals_matrix': np.eye(len(value))}
+
+def NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after):
+    return
 
 empty_bar =  {
     "layout": {

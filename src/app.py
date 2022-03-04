@@ -209,6 +209,28 @@ def update_output(n_clicks, us_state, value, date, days):
     )
     return [cor_fig, pval_fig]
 
+
+# @app.callback(
+#     [Output('cor-hm', 'figure'), Output('pval-hm', 'figure')],
+#     Input('submit-val', 'n_clicks'),
+#     [State('dropdown-2', 'value'), State('dropdown-3', 'value'), State('datepicker-2', 'date'), State('day-picker', 'value')]
+# )
+# def update_preds(n_clicks, us_state, value, date, days_before, days_after):
+#     if n_clicks == 0:
+#         return [utils.empty_heatmap, utils.empty_heatmap]
+#     output_dict = utils.NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after)
+#     correlation_matrix = output_dict['correlation_matrix']
+#     pvals_matrix = output_dict['pvals_matrix']
+#     cor_fig = px.imshow(correlation_matrix, text_auto=True, x=value, y=value)
+#     pval_fig = px.imshow(pvals_matrix, text_auto=True, x=value, y = value)
+#     cor_fig.update_layout(
+#         title_text='Correlation Matrix',
+#     )
+#     pval_fig.update_layout(
+#         title_text='P-Value Matrix',
+#     )
+#     return [cor_fig, pval_fig]
+
 # Navbar callbacks
 
 @app.callback([dash.dependencies.Output('current-tab', 'children')],
