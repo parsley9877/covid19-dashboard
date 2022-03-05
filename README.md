@@ -2,7 +2,7 @@
 
 Interactive dashboard providing visualization services, prediction, and other data analysis solutions for giving insight on COVID-19.
 
-by Anh Tran, Parsa Assadi, Nikhil Karnwal, Yu Xuan, Zhuofan Li
+by Anh Tran, Parsa Assadi, Nikhil Karnwal, Yu Xuan, Zhuofan Li, Dae Cheol Kwon
 
 ## How to run?
 
