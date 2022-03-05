@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -51,8 +52,28 @@ def get_data_by_location(locations, date, value, past_days=30, next_days=0):
     state_list = locations
         
     selected_df = df_range[df_range['state_abbrv'].isin(state_list)]
+
+    df1 = read_file(vac_data_path_base)
+    df_new = []
+    date_range1 = pd.date_range(start=start_date, end=end_date, closed='right').strftime('%m/%d/%Y')
+    for date in date_range1:
+            
+            for location in locations:
+                
+                    temp_df = df1.loc[(df1['Date']==date) & (df1['Location']==location)]
+                    if not temp_df.empty:
+                        temp_df = temp_df.loc[:,['Distributed']].values
+                        df_new.append(temp_df[0][0])
+                    else:
+                        df_new.append(np.NaN)
+                        
+                        
+    #df2 = pd.DataFrame(df_new)
+    #df2.rename(columns = {0:'Distributed'},inplace=True)
+    selected_df.insert(selected_df.shape[1],'Administered',df_new)
+    
     return selected_df[['date','Province_State','state_abbrv', *value]]
 
 if __name__ == '__main__':
-    df = get_data_by_location(['AL','CA'],'2020-12-14','Incident_Rate', 30)
+    df = get_data_by_location(['CA'],'2020-12-25',['Incident_Rate','Administered'], 30)
     print(df)
