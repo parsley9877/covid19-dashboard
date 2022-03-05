@@ -15,6 +15,8 @@ import os
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from analysis_controller import NIKHIL_CORRELATION_FUNC
+from prediction_controller import NIKHIL_PREDICTION_FUNC
 
 import utils
 
@@ -200,7 +202,7 @@ def update_output(n_clicks, us_state, value, date, days):
         print(n_clicks, us_state, value, date, days)
         return [utils.empty_heatmap, utils.empty_heatmap]
     print(n_clicks, us_state, value, date, days)
-    output_dict = utils.NIKHIL_CORRELATION_FUNC(us_state, value, date, days)
+    output_dict = NIKHIL_CORRELATION_FUNC(us_state, value, date, days)
     correlation_matrix = output_dict['correlation_matrix']
     pvals_matrix = output_dict['pvals_matrix']
     cor_fig = px.imshow(correlation_matrix, text_auto=True, x=value, y=value)
@@ -224,7 +226,7 @@ def update_preds(n_clicks, us_state, value, date, days_before, days_after):
         print(n_clicks, us_state, value, date, days_before, days_after)
         return utils.empty_pred_line
     print(n_clicks, us_state, value, date, days_before, days_after)
-    output_df = utils.NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after)
+    output_df = NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after)
     fig = px.line(output_df, x='date', y=['preds', 'actual'], markers=True,  title='Prediction for ' + value)
     return fig
 

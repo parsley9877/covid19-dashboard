@@ -1,3 +1,4 @@
+import pandas as pd
 from analysis_controller import get_rate
 from dataloader import get_data_by_location
 from statsmodels.tsa.forecasting.theta import ThetaModel
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from statsmodels.tsa.seasonal import STL
+import utils
 
 
 def get_prediction(locations, date, value, past_day, next_days):
@@ -38,13 +40,22 @@ def get_prediction(locations, date, value, past_day, next_days):
     # fig = res.plot()
     # plt.show()
 
+def NIKHIL_PREDICTION_FUNC(us_state, value, date, days_before, days_after):
+    locations = [utils.state_name_to_abbrv(us_state)]
+    df = get_prediction(locations,date,value,days_before, days_after)
+    final_df = pd.DataFrame(data= {'date': df['date'].to_numpy(), 'preds': df[f'{value}_predicted'].to_numpy(), 'actual': df[value].to_numpy()})
+
+    return final_df
+
 if __name__ == '__main__':
     values = ['Incident_Rate', 'Deaths']
     locations = ['CA']
     date = '2020-12-14'
     past_days = 20
-    res = get_prediction(locations,date,values[1],past_days, 20)
-    print(res)
+    df = get_prediction(locations,date,values[1],past_days, 20)
+    final_df = pd.DataFrame(data= {'date': df['date'].to_numpy(), 'preds': df[f'{values[1]}_predicted'].to_numpy(), 'actual': df[values[1]].to_numpy()})
+
+    print(final_df)
 
 
 

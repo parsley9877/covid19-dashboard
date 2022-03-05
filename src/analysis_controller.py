@@ -27,7 +27,7 @@ def get_rate_by_loc(locations, date, values, past_day=30):
         for j in range(len(values)):
             if i == j:
                 continue
-            corr_data = get_correlation(df[values[i]].to_numpy(),df[values[j]].to_numpy())
+            corr_data = get_correlation(df[values[i]].to_numpy(na_value=1e-5),df[values[j]].to_numpy(na_value=1e-5))
             corr_mat[i,j] = corr_data[0]
             pval_mat[i,j] = corr_data[1]
     res['corr'] = corr_mat
@@ -54,6 +54,14 @@ def get_top_regions(date, values, past_day, num_regions):
         # print(rate_vals[top_rate[-i]])
         final_res[i] = res[top_rate[-i]]
     return final_res
+
+def NIKHIL_CORRELATION_FUNC(us_state, value, date, days):
+    locations = [utils.state_name_to_abbrv(us_state)]
+    res = get_rate_by_loc(locations, date, value, past_day=30)
+    print(res['corr'])
+
+    return {'correlation_matrix': res['corr'], 'pvals_matrix': res['pval']}
+
 
 if __name__ == '__main__':
     values = ['Incident_Rate', 'Deaths']
