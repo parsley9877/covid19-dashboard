@@ -47,8 +47,7 @@ class data_reader:
 
     def read_trend(self,state):
         '''
-        Reads 3-D pixel value of the top left corner of each image in folder
-        and returns an n x 3 matrix X containing the pixel values 
+        Read The data of a given state
         '''  
         assert (state in self.states) and isinstance(state, str) 
         infect = []
