@@ -28,5 +28,5 @@ It generates a link to the local port which the app is started on. By clicking o
 
 Here is a demo of some of the features:
 
-https://user-images.githubusercontent.com/83480666/157093869-5b73617b-5622-4436-8b91-b39d4c2498b1.mov
+https://user-images.githubusercontent.com/83480666/157101056-ae2d569c-450b-43c4-943e-d549d9d5b263.mov
 
