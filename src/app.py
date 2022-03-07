@@ -74,14 +74,13 @@ header = html.Div(id='header', style={'backgroundColor':'#051833'}, children=[
 # Buttons
 
 but1 = html.Div(id='but-1', children=html.A('Visualization', id='tab-1-nav', className='nav-buttons', href='tab1'))
-but2 = html.Div(id='but-2', children=html.A('Data Analysis', id='tab-2-nav', href='tab2', className='nav-buttons'))
+# but2 = html.Div(id='but-2', children=html.A('Data Analysis', id='tab-2-nav', href='tab2', className='nav-buttons'))
 but3 = html.Div(id='but-3', children=html.A('Prediction', id='tab-3-nav', href='tab3', className='nav-buttons'))
 
 
 # Navbar
 navbar = html.Div(id='navbar', className='top-nav' ,children=[
         but1,
-        but2,
         but3,
 ])
 
@@ -178,7 +177,7 @@ third_row_tab_pred = html.Div(children=[cmpt_div_v2, dit_div_v_2, dit_div_v_2_e,
 
 first_row_tab_1 = html.Div(children=[dp_div, dd_div], className='first-row-tab1')
 tab_1 = html.Div(className='tab-1', children=[first_row_tab_1, map_div, selected_data, bar_div])
-tab_2 = html.Div(className='tab-2', children=[])
+# tab_2 = html.Div(className='tab-2', children=[])
 tab_3 = html.Div(className='tab-3', children=[second_row_tab_pred, hp_div,  third_row_tab_pred])
 
 current_tab = html.Div(id='current-tab', children=[tab_1])
@@ -237,8 +236,8 @@ def update_preds(n_clicks, us_state, value, date, days_before, days_after):
 def display_page(pathname):
     if pathname == '/tab1':
         return [tab_1]
-    elif pathname == '/tab2':
-        return [tab_2]
+    # elif pathname == '/tab2':
+    #     return [tab_2]
     elif pathname == '/tab3':
         return [tab_3]
     else:
