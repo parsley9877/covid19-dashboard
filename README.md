@@ -4,6 +4,14 @@ Interactive dashboard providing visualization services, prediction, and other da
 
 by Anh Tran, Parsa Assadi, Nikhil Karnwal, Yu Xuan, Zhuofan Li, Dae Cheol Kwon
 
+## File Structure
+
+1. `./src`: code base for interactive dashboard
+2. `./notebook`: notebook for generating visuals of the presentation
+3. `./data`: part of our datasets
+4. `./demo`: dashboard demo
+5. `./presentation`: presentation pdf
+
 ## How to run?
 
 1. `git clone git@github.com:parsley9877/covid19-dashboard.git`
